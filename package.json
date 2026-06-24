@@ -1,0 +1,56 @@
+{
+  "name": "smsgo",
+  "version": "0.1.0",
+  "description": "SDK oficial Node.js/TypeScript para a API de SMS da SMSGo — envie SMS, OTP e campanhas no Brasil em minutos.",
+  "keywords": [
+    "sms",
+    "sms-api",
+    "otp",
+    "2fa",
+    "brasil",
+    "smsgo",
+    "twilio-alternative",
+    "totalvoice-alternative"
+  ],
+  "homepage": "https://smsgo.com.br",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oryn-Labs/smsgo-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Oryn-Labs/smsgo-sdk/issues"
+  },
+  "license": "MIT",
+  "author": "SMSGo",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

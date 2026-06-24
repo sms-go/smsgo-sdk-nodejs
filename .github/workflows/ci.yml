@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run build
+      - name: smoke test (CJS + ESM)
+        run: |
+          node -e "const {SMSGo}=require('./dist/index.cjs'); if(typeof new SMSGo({apiKey:'x'}).send!=='function') process.exit(1); console.log('CJS ok')"
+          node --input-type=module -e "import {SMSGo} from './dist/index.js'; if(typeof new SMSGo({apiKey:'x'}).sendBulk!=='function') process.exit(1); console.log('ESM ok')"
