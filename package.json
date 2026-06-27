@@ -15,10 +15,10 @@
   "homepage": "https://smsgo.com.br",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Oryn-Labs/smsgo-sdk.git"
+    "url": "git+https://github.com/SMSFy/smsgo-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/Oryn-Labs/smsgo-sdk/issues"
+    "url": "https://github.com/SMSFy/smsgo-sdk/issues"
   },
   "license": "MIT",
   "author": "SMSGo",
