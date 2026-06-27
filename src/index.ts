@@ -6,7 +6,7 @@
  * e renovado automaticamente quando expira ou retorna 401.
  *
  * @example
- * import { SMSGo } from 'smsgo'
+ * import { SMSGo } from '@smsgo/sdk'
  * const smsgo = new SMSGo({ apiKey: process.env.SMSGO_KEY! })
  * await smsgo.send({ phone: '+5511999990000', message: 'Olá do SMSGo' })
  */

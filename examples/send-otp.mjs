@@ -1,6 +1,6 @@
 // Envio de um código OTP (2FA) por SMS.
 //   SMSGO_KEY=suachave node examples/send-otp.mjs +5511999990000
-import { SMSGo, SMSGoError } from 'smsgo'
+import { SMSGo, SMSGoError } from '@smsgo/sdk'
 
 const smsgo = new SMSGo({ apiKey: process.env.SMSGO_KEY })
 

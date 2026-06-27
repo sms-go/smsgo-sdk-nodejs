@@ -1,6 +1,6 @@
 // Envio simples de 1 SMS.
 //   SMSGO_KEY=suachave node examples/send-sms.mjs +5511999990000
-import { SMSGo } from 'smsgo'
+import { SMSGo } from '@smsgo/sdk'
 
 const smsgo = new SMSGo({ apiKey: process.env.SMSGO_KEY })
 

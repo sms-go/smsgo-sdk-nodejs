@@ -1,6 +1,6 @@
 // Envio em massa + consulta de status pelo id retornado.
 //   SMSGO_KEY=suachave node examples/check-status.mjs
-import { SMSGo } from 'smsgo'
+import { SMSGo } from '@smsgo/sdk'
 
 const smsgo = new SMSGo({ apiKey: process.env.SMSGO_KEY })
 

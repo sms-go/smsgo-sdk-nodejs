@@ -1,9 +1,9 @@
 # smsgo
 
-[![npm](https://img.shields.io/npm/v/smsgo.svg)](https://www.npmjs.com/package/smsgo)
-[![downloads](https://img.shields.io/npm/dm/smsgo.svg)](https://www.npmjs.com/package/smsgo)
+[![npm](https://img.shields.io/npm/v/@smsgo/sdk.svg)](https://www.npmjs.com/package/@smsgo/sdk)
+[![downloads](https://img.shields.io/npm/dm/@smsgo/sdk.svg)](https://www.npmjs.com/package/@smsgo/sdk)
 [![CI](https://github.com/SMSFy/smsgo-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/SMSFy/smsgo-sdk/actions/workflows/ci.yml)
-[![license](https://img.shields.io/npm/l/smsgo.svg)](./LICENSE)
+[![license](https://img.shields.io/npm/l/@smsgo/sdk.svg)](./LICENSE)
 
 SDK oficial **Node.js / TypeScript** para a [SMSGo](https://smsgo.com.br) — a API de SMS simples para o Brasil. Envie **OTP/2FA, alertas transacionais e campanhas** com algumas linhas de código.
 
@@ -18,14 +18,14 @@ SDK oficial **Node.js / TypeScript** para a [SMSGo](https://smsgo.com.br) — a 
 ## Instalação
 
 ```bash
-npm install smsgo
-# ou: pnpm add smsgo / yarn add smsgo
+npm install @smsgo/sdk
+# ou: pnpm add @smsgo/sdk / yarn add @smsgo/sdk
 ```
 
 ## Começo rápido
 
 ```ts
-import { SMSGo } from 'smsgo'
+import { SMSGo } from '@smsgo/sdk'
 
 const smsgo = new SMSGo({ apiKey: process.env.SMSGO_KEY! })
 
@@ -75,7 +75,7 @@ const one = await smsgo.get('a1b2c3-...') // status de um envio específico
 Toda resposta não-2xx vira um `SMSGoError` com `status` e um `code` estável:
 
 ```ts
-import { SMSGo, SMSGoError } from 'smsgo'
+import { SMSGo, SMSGoError } from '@smsgo/sdk'
 
 try {
   await smsgo.send({ phone: '+5511999990000', message: 'Olá' })

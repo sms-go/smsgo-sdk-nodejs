@@ -1,5 +1,5 @@
 {
-  "name": "smsgo",
+  "name": "@smsgo/sdk",
   "version": "0.1.0",
   "description": "SDK oficial Node.js/TypeScript para a API de SMS da SMSGo — envie SMS, OTP e campanhas no Brasil em minutos.",
   "keywords": [
