@@ -4,7 +4,7 @@ Todas as mudanças relevantes deste pacote são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
-## [0.1.0] - Não lançado
+## [0.1.0] - 2026-06-27
 
 ### Adicionado
 
