@@ -27,6 +27,11 @@ jobs:
       # re-run), pula o publish e encerra verde — o npm é imutável por versão.
       - name: Versão já publicada?
         id: check
+        # NODE_AUTH_TOKEN é necessário aqui: o setup-node grava um .npmrc com o
+        # placeholder ${NODE_AUTH_TOKEN}; sem a env, QUALQUER comando npm falha ao
+        # resolver o placeholder (não por a versão faltar). É só leitura pública.
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if npm view "@orynlabs/smsgo@$VERSION" version >/dev/null 2>&1; then
