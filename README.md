@@ -233,7 +233,7 @@ Em falhas de validação (422), `err.errors` traz o detalhe por campo (`{ field,
 
 - `list(params)` · `create(input)` · `get(id)` · `update(id, input)` · `delete(id)`.
 
-> Referência de máquina completa: [smspulse.apidog.io](https://smspulse.apidog.io/) — importável no Apidog/Postman.
+> Referência de máquina completa: [smsgo.apidog.io](https://smsgo.apidog.io/) — importável no Apidog/Postman.
 
 ## Exemplos
 
@@ -254,7 +254,7 @@ SMSGO_KEY=suachave node examples/send-otp.mjs +5511999990000
 
 ## Migrando da TotalVoice / Twilio?
 
-SMSGo foca em **DX simples e preço em real**. Sem cadastro de remetente pra começar, sem cobrança em dólar, créditos que não expiram. Documentação completa da API: **[smspulse.apidog.io](https://smspulse.apidog.io/)**.
+SMSGo foca em **DX simples e preço em real**. Sem cadastro de remetente pra começar, sem cobrança em dólar, créditos que não expiram. Documentação completa da API: **[smsgo.apidog.io](https://smsgo.apidog.io/)**.
 
 ## Licença
 
