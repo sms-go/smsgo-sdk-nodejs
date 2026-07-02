@@ -808,13 +808,30 @@ function httpCodeName(status: number): string {
 export function verifyWebhookSignature(
   rawBody: string | Uint8Array,
   signatureHeader: string | null | undefined,
-  secret: string
+  secret: string,
+  opts?: { toleranceSeconds?: number }
 ): boolean {
   if (!signatureHeader || !secret) return false
   const expected = 'sha256=' + createHmac('sha256', secret).update(rawBody).digest('hex')
   const a = Buffer.from(signatureHeader)
   const b = Buffer.from(expected)
-  return a.length === b.length && timingSafeEqual(a, b)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return false
+
+  // Anti-replay opcional: além da assinatura, exige que o `sentAt` do corpo
+  // esteja dentro de uma janela de frescor (segundos). Deduplique também pelo
+  // `id` do corpo para idempotência. Sem `toleranceSeconds`, o comportamento é
+  // idêntico ao anterior (só assinatura).
+  if (opts?.toleranceSeconds != null) {
+    try {
+      const text = typeof rawBody === 'string' ? rawBody : Buffer.from(rawBody).toString('utf8')
+      const sentAt = Date.parse(JSON.parse(text)?.sentAt)
+      if (!Number.isFinite(sentAt)) return false
+      if (Math.abs(Date.now() - sentAt) > opts.toleranceSeconds * 1000) return false
+    } catch {
+      return false
+    }
+  }
+  return true
 }
 
 export default SMSGo
