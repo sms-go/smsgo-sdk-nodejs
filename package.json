@@ -1,6 +1,6 @@
 {
   "name": "@orynlabs/smsgo",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "SDK oficial Node.js/TypeScript para a API de SMS da SMSGo — envie SMS, OTP e campanhas no Brasil em minutos.",
   "keywords": [
     "sms",
