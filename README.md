@@ -1,15 +1,16 @@
-# smsgo
+# @orynlabs/smsgo
 
 [![npm](https://img.shields.io/npm/v/@orynlabs/smsgo.svg)](https://www.npmjs.com/package/@orynlabs/smsgo)
 [![downloads](https://img.shields.io/npm/dm/@orynlabs/smsgo.svg)](https://www.npmjs.com/package/@orynlabs/smsgo)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-green.svg)](https://nodejs.org/)
 [![CI](https://github.com/sms-go/smsgo-sdk-nodejs/actions/workflows/ci.yml/badge.svg)](https://github.com/sms-go/smsgo-sdk-nodejs/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/@orynlabs/smsgo.svg)](./LICENSE)
 
-SDK oficial **Node.js / TypeScript** para a [SMSGo](https://smsgo.com.br) — a API de SMS simples para o Brasil. Envie **OTP/2FA, alertas transacionais e campanhas** com algumas linhas de código.
+> SDK oficial **Node.js / TypeScript** para a [SMSGo](https://smsgo.com.br) — a API de SMS simples para o Brasil. Envie **OTP/2FA, alertas transacionais e campanhas** com poucas linhas de código.
 
 - ⚡ **Integra em minutos** — autenticação cuidada pra você (sem ritual de token manual).
 - 💸 **Sem mensalidade** — créditos pré-pagos que não expiram, preço em real.
-- 🇧🇷 **Brasil-first** — entrega para todas as operadoras, LGPD nativo.
+- 🇧🇷 **Brasil-first** — entrega otimizada para Vivo, Claro, TIM, Oi e demais operadoras.
 - 🟢 **Zero dependências** — usa o `fetch` nativo (Node 18+). Tipado de ponta a ponta.
 - 🎁 **R$ 10 grátis** ao criar a conta — dá pra testar sem cartão.
 
@@ -37,7 +38,7 @@ const result = await smsgo.send({
 console.log(result.id, result.status) // -> "a1b2c3...", "queued"
 ```
 
-Você passa só a `apiKey`. O SDK troca a chave por um token Bearer (válido 48h), guarda em cache e renova sozinho quando expira.
+Você passa só a `apiKey`. O SDK troca a chave por um token Bearer (válido 48h), guarda em cache e renova sozinho quando expira ou a API retornar `401`.
 
 ## Enviar um OTP (2FA)
 
@@ -67,9 +68,9 @@ await smsgo.sendBulk({
 
 ```ts
 const page = await smsgo.list({ page: 1 }) // { meta, data: SendListItem[] }
-const one = await smsgo.get('a1b2c3-...') // detalhe + summary { total, delivered, failed, inProgress, done }
+const one = await smsgo.get('a1b2c3-...') // detalhe + summary de entregas
 
-// Acompanhar um envio grande sem baixar tudo — números por bucket, paginado:
+// Números por bucket, paginado — útil para envios grandes:
 const failed = await smsgo.getNumbers('a1b2c3-...', { status: 'failed', page: 1 })
 ```
 
@@ -80,9 +81,9 @@ Use a **chave de teste** (prefixo `test_`, no painel → Minha conta → API) co
 ```ts
 const sandbox = new SMSGo({ apiKey: process.env.SMSGO_TEST_KEY! })
 const r = await sandbox.send({ phone: '+5511999990000', message: 'Teste' })
-r.test // true
+console.log(r.test) // true
 
-await sandbox.resolveMode() // "test"  (ou smsgo.mode após a 1ª chamada)
+await sandbox.resolveMode() // "test"  (ou `sandbox.mode` após a 1ª chamada)
 ```
 
 ## Saldo e catálogo
@@ -101,7 +102,7 @@ const plans = await smsgo.billing.plans() // pacotes por faixa
 const cards = await smsgo.billing.cards() // 4 últimos dígitos
 
 const receipt = await smsgo.billing.purchase({ quantity: 5000 /*, planId, cardId, coupon */ })
-receipt.status // 'succeeded' já creditou o saldo | 'processing' confirma via webhook
+console.log(receipt.status) // 'succeeded' já creditou | 'processing' confirma via webhook
 
 const invoices = await smsgo.billing.invoices({ page: 1 })
 ```
@@ -172,8 +173,8 @@ try {
   if (err instanceof SMSGoError) {
     switch (err.code) {
       case 'insufficient_balance': // 402 — sem saldo
-      case 'rate_limited':         // 429 — muitas requisições (veja err.details)
-      case 'validation_error':     // 422 — dados inválidos
+      case 'rate_limited': // 429 — muitas requisições (veja err.details)
+      case 'validation_error': // 422 — dados inválidos (veja err.errors)
       default:
         console.error(err.status, err.code, err.message)
     }
@@ -183,28 +184,28 @@ try {
 
 Em falhas de validação (422), `err.errors` traz o detalhe por campo (`{ field, message }[]`).
 
-| `code`                     | HTTP | Significado                          |
-| -------------------------- | ---- | ------------------------------------ |
-| `validation_error`         | 422  | Dados do request inválidos           |
-| `bad_request`              | 400  | Requisição malformada                |
-| `unauthorized`             | 401  | Chave/token inválido                 |
-| `insufficient_balance`     | 402  | Saldo insuficiente                   |
-| `provider_out_of_stock`    | 409  | Estoque do provedor indisponível     |
-| `rate_limited`             | 429  | Limite de requisições atingido       |
-| `card_declined`            | 402  | Cartão recusado na compra            |
-| `authentication_required`  | 402  | Cartão exige autenticação (SCA)      |
-| `card_required`            | 400  | Nenhum cartão apto à cobrança        |
-| `payment_unavailable`      | 503  | Gateway de pagamento indisponível    |
+| `code`                    | HTTP | Significado                       |
+| ------------------------- | ---- | --------------------------------- |
+| `bad_request`             | 400  | Requisição malformada             |
+| `unauthorized`            | 401  | Chave/token inválido              |
+| `insufficient_balance`    | 402  | Saldo insuficiente                |
+| `provider_out_of_stock`   | 409  | Estoque do provedor indisponível  |
+| `validation_error`        | 422  | Dados do request inválidos        |
+| `rate_limited`            | 429  | Limite de requisições atingido    |
+| `card_declined`           | 402  | Cartão recusado na compra         |
+| `authentication_required` | 402  | Cartão exige autenticação (SCA)   |
+| `card_required`           | 400  | Nenhum cartão apto à cobrança     |
+| `payment_unavailable`     | 503  | Gateway de pagamento indisponível |
 
 ## Referência da API
 
 ### `new SMSGo(options)`
 
-| Opção     | Tipo            | Default                      | Descrição                          |
-| --------- | --------------- | ---------------------------- | ---------------------------------- |
-| `apiKey`  | `string`        | —                            | **Obrigatório.** Sua SMSGo-key.    |
-| `baseUrl` | `string`        | `https://api.smsgo.com.br`   | Não precisa mexer; só se a SMSGo orientar. |
-| `fetch`   | `typeof fetch`  | `globalThis.fetch`           | Injete um fetch (ex.: undici).     |
+| Opção     | Tipo           | Default                    | Descrição                       |
+| --------- | -------------- | -------------------------- | ------------------------------- |
+| `apiKey`  | `string`       | —                          | **Obrigatório.** Sua SMSGo-key. |
+| `baseUrl` | `string`       | `https://api.smsgo.com.br` | Só altere se a SMSGo orientar.  |
+| `fetch`   | `typeof fetch` | `globalThis.fetch`         | Injete um fetch (ex.: undici).  |
 
 ### Métodos
 
@@ -233,24 +234,22 @@ Em falhas de validação (422), `err.errors` traz o detalhe por campo (`{ field,
 
 - `list(params)` · `create(input)` · `get(id)` · `update(id, input)` · `delete(id)`.
 
-> Referência de máquina completa: [smsgo.apidog.io](https://smsgo.apidog.io/) — importável no Apidog/Postman.
+> Referência de máquina completa: **[smsgo.apidog.io](https://smsgo.apidog.io/)** — importável no Apidog/Postman.
 
 ## Exemplos
 
-Na pasta [`examples/`](./examples) (Node 18+). Para rodar a partir do repositório clonado, instale antes — o `npm install` já builda o `dist` (via `prepare`) e os exemplos resolvem o pacote por *self-reference*:
+Na pasta [`examples/`](./examples) (Node 18+):
 
 ```bash
 npm install
+SMSGO_KEY=suachave node examples/send-sms.mjs
 SMSGO_KEY=suachave node examples/send-otp.mjs +5511999990000
+SMSGO_KEY=suachave node examples/check-status.mjs
+SMSGO_KEY=suachave node examples/check-balance.mjs
+SMSGO_KEY=suachave node examples/buy-credits.mjs
+SMSGO_KEY=suachave node examples/configure-webhook.mjs
+SMSGO_WEBHOOK_SECRET=whsec_... node examples/receive-dlr-webhook.mjs
 ```
-
-- [`send-sms.mjs`](./examples/send-sms.mjs) — envio simples
-- [`send-otp.mjs`](./examples/send-otp.mjs) — código OTP/2FA
-- [`check-status.mjs`](./examples/check-status.mjs) — envio em massa + consulta de status
-- [`check-balance.mjs`](./examples/check-balance.mjs) — saldo + catálogo de tipos de SMS
-- [`buy-credits.mjs`](./examples/buy-credits.mjs) — compra off-session + recarga automática
-- [`configure-webhook.mjs`](./examples/configure-webhook.mjs) — configura o webhook de saída
-- [`receive-dlr-webhook.mjs`](./examples/receive-dlr-webhook.mjs) — recebe callbacks de entrega (DLR)
 
 ## Migrando da TotalVoice / Twilio?
 
