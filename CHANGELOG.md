@@ -4,6 +4,34 @@ Todas as mudanças relevantes deste pacote são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.5.0] - 2026-10-09
+
+### Alterado
+
+- **Publicação por Trusted Publishing (OIDC):** o `publish.yml` não usa mais o `NPM_TOKEN`, que
+  exigia 2FA e falhava com `EOTP`. O pacote sai com provenance automática.
+- README atualizado.
+
+### Compatibilidade
+
+- **Nenhuma mudança de código** em relação à 0.4.0: a API pública é idêntica. Os SDKs Python, Go
+  e PHP seguem em 0.4.0; os recursos de envio internacional entram na próxima versão unificada.
+
+## [0.4.0] - 2026-07-02
+
+### Adicionado
+
+- **Anti-replay opcional em `verifyWebhookSignature`:** o novo 4º argumento
+  `{ toleranceSeconds }` exige, além da assinatura, que o `sentAt` do corpo esteja dentro da
+  janela de frescor. Corpo sem `sentAt` válido, ou fora da janela, retorna `false`. Para
+  idempotência, deduplique também pelo `id` do corpo.
+
+### Compatibilidade
+
+- 100% retrocompatível: sem `toleranceSeconds`, o comportamento é o da 0.3.0 (só assinatura).
+- Esta versão foi marcada em 02/jul/2026, mas o publish no npm falhou com `EOTP` e ela só chegou
+  ao registry depois, publicada à mão.
+
 ## [0.3.0] - 2026-07-01
 
 ### Adicionado
