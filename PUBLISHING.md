@@ -4,11 +4,20 @@ Guia de release do SDK Node.js. Registry: **npm** · pacote `@orynlabs/smsgo` (e
 
 ## Pré-requisitos (uma vez)
 
-1. Conta npm com permissão de publish no escopo `@orynlabs` (membro da org/escopo).
-2. **Automation token** (npm → _Access Tokens → Generate New Token → Automation_ — ignora 2FA em CI).
-3. No GitHub do repo (`sms-go/smsgo-sdk-nodejs`) → _Settings → Secrets and variables → Actions_ → criar o secret **`NPM_TOKEN`** com esse token.
+A publicação usa **Trusted Publishing** (OIDC): o npm confia no workflow
+[`/.github/workflows/publish.yml`](.github/workflows/publish.yml) deste repo e emite uma
+credencial de uso único a cada execução. **Não há token**, então o 2FA da conta não bloqueia o CI.
+O antigo `NPM_TOKEN` falhava com `EOTP` e derrubou o release da 0.4.0 em jul/2026.
 
-O workflow [`/.github/workflows/publish.yml`](.github/workflows/publish.yml) já faz o resto: valida o token com `npm whoami`, builda e roda `npm publish --provenance --access public`.
+Configurar uma vez, logado no npm com 2FA, por **um** dos caminhos:
+
+- **Site:** npmjs.com → `@orynlabs/smsgo` → _Settings → Trusted Publisher → GitHub Actions_,
+  com organização `sms-go`, repositório `smsgo-sdk-nodejs` e workflow `publish.yml` (ambiente vazio).
+- **CLI** (npm ≥ 11.5): `npm trust github @orynlabs/smsgo --file publish.yml --repo sms-go/smsgo-sdk-nodejs --allow-publish`.
+  Um token que ignora 2FA recebe `403`; use a sessão de `npm login`.
+
+Depois do primeiro publish verde, apague o secret `NPM_TOKEN` do repo e, no npm, marque
+_Require two-factor authentication and disallow tokens_ no pacote.
 
 ## Passo a passo do release
 
@@ -24,7 +33,7 @@ O workflow [`/.github/workflows/publish.yml`](.github/workflows/publish.yml) já
    No GitHub → _Releases → Draft a new release_ → escolha a tag `v0.3.0` → _Publish release_.
    Isso dispara o `publish.yml` (evento `release: published`).
    - Alternativa: _Actions → Publish to npm → Run workflow_ (`workflow_dispatch`).
-   - Fallback local: `npm login && npm publish --provenance --access public`.
+   - Fallback local: `npm login && npm publish --access public --otp=<código 2FA>` (sem provenance: ela só existe no CI).
 
 ## Verificação pós-publicação
 

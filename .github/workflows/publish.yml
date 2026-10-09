@@ -2,7 +2,12 @@ name: Publish to npm
 
 # Publica no npm ao criar uma Release no GitHub, ou manualmente pelo botão
 # "Run workflow" na aba Actions (workflow_dispatch).
-# Pré-requisito: secret NPM_TOKEN (Automation token) no repositório.
+#
+# Autenticação por Trusted Publishing (OIDC), sem token: o npm confia neste
+# workflow (sms-go/smsgo-sdk-nodejs, publish.yml) e emite uma credencial de uso
+# único a cada execução. Substituiu o NPM_TOKEN, que exigia 2FA (EOTP) e
+# derrubou a 0.4.0 em jul/2026. Pré-requisito único: o Trusted Publisher
+# configurado em npmjs.com → @orynlabs/smsgo → Settings (ver PUBLISHING.md).
 on:
   release:
     types: [published]
@@ -10,28 +15,27 @@ on:
 
 permissions:
   contents: read
-  id-token: write # habilita provenance (cadeia de origem verificável)
+  id-token: write # OIDC do Trusted Publishing (e provenance automática)
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # Sem registry-url: ele grava um .npmrc com ${NODE_AUTH_TOKEN}, e sem a
+      # env qualquer comando npm falha ao resolver o placeholder. O registry
+      # padrão já é o npmjs.
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-          registry-url: 'https://registry.npmjs.org'
+      # Trusted Publishing exige npm >= 11.5.1; o Node 22 traz o 10.x.
+      - run: npm install -g npm@11
       - run: npm install
       - run: npm run build
       # Se a versão do package.json já está no npm (ex.: Release retroativo ou
       # re-run), pula o publish e encerra verde — o npm é imutável por versão.
       - name: Versão já publicada?
         id: check
-        # NODE_AUTH_TOKEN é necessário aqui: o setup-node grava um .npmrc com o
-        # placeholder ${NODE_AUTH_TOKEN}; sem a env, QUALQUER comando npm falha ao
-        # resolver o placeholder (não por a versão faltar). É só leitura pública.
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if npm view "@orynlabs/smsgo@$VERSION" version >/dev/null 2>&1; then
@@ -40,15 +44,6 @@ jobs:
           else
             echo "already=false" >> "$GITHUB_OUTPUT"
           fi
-      # Valida o NPM_TOKEN sem publicar: imprime o usuário npm se o token
-      # autenticar; falha aqui (e aborta o publish) se estiver errado/ausente.
-      - name: Validar NPM_TOKEN (whoami)
-        if: steps.check.outputs.already == 'false'
-        run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publicar no npm
         if: steps.check.outputs.already == 'false'
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
